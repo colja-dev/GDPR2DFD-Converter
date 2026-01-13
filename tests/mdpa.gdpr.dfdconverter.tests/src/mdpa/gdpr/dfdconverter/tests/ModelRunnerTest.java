@@ -11,7 +11,6 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.Collection;
 import java.util.*;
-import org.dataflowanalysis.converter.PCMConverter;
 import org.dataflowanalysis.dfd.datadictionary.DataDictionary;
 import org.dataflowanalysis.dfd.datadictionary.datadictionaryFactory;
 import org.dataflowanalysis.dfd.dataflowdiagram.DataFlowDiagram;
@@ -31,8 +30,11 @@ import mdpa.gdpr.dfdconverter.DFD2GDPR;
 import mdpa.gdpr.dfdconverter.GDPR2DFD;
 import mdpa.gdpr.dfdconverter.tracemodel.tracemodel.TraceModel;
 import mdpa.gdpr.dfdconverter.tracemodel.tracemodel.TracemodelFactory;
+import mdpa.gdpr.metamodel.GDPR.Data;
 import mdpa.gdpr.metamodel.GDPR.GDPRFactory;
 import mdpa.gdpr.metamodel.GDPR.LegalAssessmentFacts;
+import mdpa.gdpr.metamodel.GDPR.Processing;
+import mdpa.gdpr.metamodel.GDPR.Purpose;
 
 public class ModelRunnerTest {		
 
@@ -151,7 +153,7 @@ public class ModelRunnerTest {
         	LegalAssessmentFacts laf = dfd2gdpr.getLegalAssessmentFacts();
         	TraceModel trace = dfd2gdpr.getDFD2GDPRTrace();
 
-        	assertEquals(dfd.getNodes().size(), laf.getProcessing().size());
+        	assertEquals(dfd.getNodes().size(), laf.getActions().stream().filter(a -> a instanceof Processing).count());
         	
         	GDPR2DFD gdpr2dfd = new GDPR2DFD(laf, dd, trace);
         	gdpr2dfd.transform();
@@ -162,7 +164,7 @@ public class ModelRunnerTest {
         	DataDictionary dd2 = gdpr2dfd.getDataDictionary();   
         	trace = gdpr2dfd.getGDPR2DFDTrace();
 
-        	assertEquals(dfd2.getNodes().size(), laf.getProcessing().size());
+        	assertEquals(dfd2.getNodes().size(), laf.getActions().stream().filter(a -> a instanceof Processing).count());
         	
         	DFD2GDPR dfd2gdpr2 = new DFD2GDPR(dfd2, dd2, trace);
         	dfd2gdpr2.transform();
@@ -171,7 +173,7 @@ public class ModelRunnerTest {
         	LegalAssessmentFacts laf2 = dfd2gdpr2.getLegalAssessmentFacts();
         	trace = dfd2gdpr2.getDFD2GDPRTrace();
 
-        	assertEquals(dfd.getNodes().size(), laf2.getProcessing().size());
+        	assertEquals(dfd.getNodes().size(), laf2.getActions().stream().filter(a -> a instanceof Processing).count());
         	
         	GDPR2DFD gdpr2dfd2 = new GDPR2DFD(laf2, dd2, trace);
         	gdpr2dfd2.transform();
@@ -245,7 +247,7 @@ public class ModelRunnerTest {
     }
     
     
-    public static Collection<File[]> convertPalladio() {
+    /*public static Collection<File[]> convertPalladio() {
     	List<File[]> testData = new ArrayList<>();
     	var pcmData = dataPCM();
     	System.out.println(pcmData.size());
@@ -269,7 +271,7 @@ public class ModelRunnerTest {
         	testData.add(new File[] {new File(resultFolder + name + ".dataflowdiagram"), new File(resultFolder + name + ".datadictionary")});
     	});
     	return testData;
-    }
+    }*/
     
     public static void annotateMetaData(String fileName, String folder) {
     	StringBuilder builder = new StringBuilder();
@@ -325,9 +327,9 @@ public class ModelRunnerTest {
 			var laf = (LegalAssessmentFacts) gdprResource.getContents().get(0);
 			
 			builder.append("GDPR Cycle " + (i+1) + ":").append("\n");
-			builder.append("Number of Processings: ").append(laf.getProcessing().size()).append("\n");
-			builder.append("Number of Data: ").append(laf.getData().size()).append("\n");
-			builder.append("Number of Purposes: ").append(laf.getPurposes().size()).append("\n");
+			builder.append("Number of Processings: ").append(laf.getActions().stream().filter(a -> a instanceof Processing).count()).append("\n");
+			builder.append("Number of Data: ").append(laf.getObjects().stream().filter(o -> o instanceof Data).count()).append("\n");
+			builder.append("Number of Purposes: ").append(laf.getContext().stream().filter(c -> c instanceof Purpose).count()).append("\n");
 			
 			newFileName += "2D2G";
     	}		

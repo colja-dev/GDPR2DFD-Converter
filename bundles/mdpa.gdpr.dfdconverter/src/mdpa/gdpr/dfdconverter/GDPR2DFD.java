@@ -13,6 +13,7 @@ import org.eclipse.emf.ecore.xmi.impl.XMIResourceFactoryImpl;
 import org.eclipse.emf.ecore.xmi.impl.XMLResourceFactoryImpl;
 
 import mdpa.gdpr.metamodel.GDPR.*;
+import mdpa.laf.referencemodel.LAF.AssessmentFact;
 import tools.mdsd.modelingfoundations.identifier.Entity;
 import mdpa.gdpr.dfdconverter.tracemodel.tracemodel.*;
 
@@ -239,26 +240,13 @@ public class GDPR2DFD {
 		annotateNodeLabels();
 		
 		//Create Flows
-		laf.getProcessing().stream().forEach(p -> {
-			dfd.getFlows().addAll(createFlows(p));
+		laf.getActions().stream().filter(a -> a instanceof Processing).forEach(p -> {
+			dfd.getFlows().addAll(createFlows((Processing)p));
 		});
-		
-		//Sorry for that but otherwise containment causes issues
-		var newFlowTraces = outTrace.getFlowTraces().stream().map(ft -> {
-			var flowTrace = TracemodelFactory.eINSTANCE.createFlowTrace();
-			flowTrace.setDataFlow(dfd.getFlows().stream().filter(flow -> flow.getId().equals(ft.getDataFlow().getId())).findAny().orElseThrow());
-			flowTrace.setData(ft.getData());
-			flowTrace.setDest(ft.getDest());
-			flowTrace.setSource(ft.getSource());
-			return flowTrace;
-		}).toList();
-		
-		outTrace.getFlowTraces().clear();
-		outTrace.getFlowTraces().addAll(newFlowTraces);
-		
+				
 		// Create/Annotate Behaviors to Nodes
-		laf.getProcessing().stream().forEach(p -> {
-			annotateBehaviour(p);
+		laf.getActions().stream().filter(a -> a instanceof Processing).forEach(p -> {
+			annotateBehaviour((Processing)p);
 		});
 		
 	}
@@ -303,71 +291,68 @@ public class GDPR2DFD {
 	 * Creates all Labels to hold GDPR specific information
 	 */
 	private void createLabels() {
-		laf.getInvolvedParties().forEach(role -> {
-			if (role instanceof NaturalPerson) convertElementToLabel(role,this.personLabelType);
-			else if (role instanceof ThirdParty) convertElementToLabel(role, this.thirdPartyLabelType);
-			else if (role instanceof Controller) convertElementToLabel(role, this.controllerLabelType);		
-		});
+		laf.getContext().forEach(context -> {
+			if (context instanceof Consent) convertElementToLabel(context, this.consentLabelType);
+			else if (context instanceof Obligation) convertElementToLabel(context, this.obligationLabelType);
+			else if (context instanceof PerformanceOfContract) convertElementToLabel(context, this.contractLabelType);
+			else if (context instanceof ExerciseOfPublicAuthority) convertElementToLabel(context, this.authorityLabelType);
+			else if (context instanceof NaturalPerson) convertElementToLabel(context,this.personLabelType);
+			else if (context instanceof Purpose) convertElementToLabel(context,this.purposeLabelType);
+		});		
 		
-		laf.getLegalBases().forEach(legalBasis -> {
-			if (legalBasis instanceof Consent) convertElementToLabel(legalBasis, this.consentLabelType);
-			else if (legalBasis instanceof Obligation) convertElementToLabel(legalBasis, this.obligationLabelType);
-			else if (legalBasis instanceof PerformanceOfContract) convertElementToLabel(legalBasis, this.contractLabelType);
-			else if (legalBasis instanceof ExerciseOfPublicAuthority) convertElementToLabel(legalBasis, this.authorityLabelType);
-		});
+		laf.getSubjects().forEach(subjects -> {			
+			if (subjects instanceof ThirdParty) convertElementToLabel(subjects, this.thirdPartyLabelType);
+			else if (subjects instanceof Controller) convertElementToLabel(subjects, this.controllerLabelType);		
+		});		
 		
-		laf.getPurposes().forEach(purpose -> {
-			convertElementToLabel(purpose, this.purposeLabelType);
-		});
-		
-		laf.getData().forEach(data -> {
-			if (data instanceof PersonalData personalData) convertElementToLabel(data, this.personalDataLabelType);
-			else convertElementToLabel(data, dataLabelType);
+		laf.getObjects().forEach(object -> {
+			if (object instanceof PersonalData) convertElementToLabel(object, this.personalDataLabelType);
+			else if (object instanceof Data)convertElementToLabel(object, dataLabelType);
 		});
 		
 		createProcessingTypeLabels();
 	}
 	
-	private void convertElementToLabel(AbstractGDPRElement gdprElement, LabelType type) {
-		if(!entityToLabelMap.containsKey(gdprElement)) {
+	private void convertElementToLabel(AssessmentFact assessmentFact, LabelType type) {
+		if(!entityToLabelMap.containsKey(assessmentFact)) {
 			Label label;
-			var optLt = labelTraceLookup(gdprElement, type);
+			var optLt = labelTraceLookup(assessmentFact, type);
 			if (optLt.isPresent()) {
 				LabelTrace lt = optLt.get();
 				label = lt.getLabel();
 				type.getLabel().add(label);
 				outTrace.getLabelTraces().add(lt);
 			} else {
-				label = createLabel(gdprElement, type);
-				addLabelTrace(gdprElement, label, type);
+				label = createLabel(assessmentFact, type);
+				addLabelTrace(assessmentFact, label, type);
 			}
-			entityToLabelMap.put(gdprElement, label);
+			entityToLabelMap.put(assessmentFact, label);
 		}
 	}
 	
-	private Label createLabel(AbstractGDPRElement gdprElement, LabelType type) {
+	private Label createLabel(AssessmentFact assessmentFact, LabelType type) {
 		Label label;
 		label = ddFactory.createLabel();
-		label.setEntityName(gdprElement.getEntityName());
-		label.setId(gdprElement.getId());
+		label.setEntityName(assessmentFact.getEntityName());
+		label.setId(assessmentFact.getId());
 		type.getLabel().add(label);
 		return label;
 	}
 	
-	private Optional<LabelTrace> labelTraceLookup(AbstractGDPRElement gdprElement, LabelType type) {
+	private Optional<LabelTrace> labelTraceLookup(AssessmentFact assessmentFact, LabelType type) {
 		if (inTrace == null) {
 			return Optional.empty();
 		}
 		return inTrace.getLabelTraces().stream()
 				.filter( // same id ensures same element, same labeltype also ensures same gdpr class
 						lt -> lt.getLabelType().getEntityName().equals(type.getEntityName()) && 
-							  lt.getGdprElement().getId().equals(gdprElement.getId()))
+							  lt.getAssessmentFact().getId().equals(assessmentFact.getId()))
 				.findAny();
 	}
 	
-	private void addLabelTrace(AbstractGDPRElement gdprElement, Label label, LabelType type) {
+	private void addLabelTrace(AssessmentFact assessmentFact, Label label, LabelType type) {
 		var lt = TracemodelFactory.eINSTANCE.createLabelTrace();
-		lt.setGdprElement(gdprElement);
+		lt.setAssessmentFact(assessmentFact);
 		lt.setLabel(label);
 		lt.setLabelType(type);
 		outTrace.getLabelTraces().add(lt);
@@ -386,8 +371,8 @@ public class GDPR2DFD {
 	}
 	
 	private void createNodes() {
-		laf.getProcessing().stream().forEach(p -> {
-			Node node = convertProcessing(p);
+		laf.getActions().stream().filter(p -> p instanceof Processing).forEach(p -> {
+			Node node = convertProcessing((Processing) p);
 			dfd.getNodes().add(node);
 		});
 	}
@@ -460,8 +445,8 @@ public class GDPR2DFD {
 	}
 
 	private void annotateNodeLabels() {
-		laf.getProcessing().stream().forEach(p -> {
-			addNodeLabels(p);
+		laf.getActions().stream().filter(p -> p instanceof Processing).forEach(p -> {
+			addNodeLabels((Processing) p);
 		});
 	}
 	

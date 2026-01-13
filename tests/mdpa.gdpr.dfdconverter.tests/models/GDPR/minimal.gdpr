@@ -1,31 +1,17 @@
 <?xml version="1.0" encoding="ASCII"?>
-<GDPR:LegalAssessmentFacts xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:GDPR="http://www.example.org/GDPR" id="_tt-9EPHNEe62x6SamO9Dsg">
-  <processing xsi:type="GDPR:Usage" id="xvpuf8" entityName="Anonymization" purpose="8k3v" onTheBasisOf="772yn" followingProcessing="kqcy12">
-    <inputData href="models/GDPR/minimal.gdpr#fi6k6x"/>
-    <outputData href="models/GDPR/minimal.gdpr#mnpnio"/>
-  </processing>
-  <processing xsi:type="GDPR:Transferring" id="kqcy12" entityName="Transferring" purpose="8k3v" onTheBasisOf="y7y8dg" followingProcessing="fas8l">
-    <inputData href="models/GDPR/minimal.gdpr#mnpnio"/>
-    <outputData href="models/GDPR/minimal.gdpr#mnpnio"/>
-  </processing>
-  <processing xsi:type="GDPR:Usage" id="fas8l" entityName="Usage" purpose="8k3v" onTheBasisOf="quu8ak" followingProcessing="1liryp">
-    <inputData href="models/GDPR/minimal.gdpr#mnpnio"/>
-    <outputData href="models/GDPR/minimal.gdpr#mnpnio"/>
-  </processing>
-  <processing xsi:type="GDPR:Storing" id="1liryp" entityName="Storage" purpose="8k3v" onTheBasisOf="quu8ak">
-    <inputData href="models/GDPR/minimal.gdpr#mnpnio"/>
-  </processing>
-  <processing xsi:type="GDPR:Collecting" id="g4z568" entityName="Collecting" purpose="8k3v" onTheBasisOf="f7dnl" followingProcessing="xvpuf8">
-    <outputData href="models/GDPR/minimal.gdpr#fi6k6x"/>
-  </processing>
-  <purposes id="8k3v" entityName="Purpose"/>
-  <data id="mnpnio" entityName="Data"/>
-  <data xsi:type="GDPR:PersonalData" id="fi6k6x" entityName="Personal Data" dataReferences="m0b8x"/>
-  <legalBases xsi:type="GDPR:Obligation" id="quu8ak" entityName="Obligation" forPurpose="8k3v"/>
-  <legalBases xsi:type="GDPR:Consent" id="772yn" entityName="Consent" forPurpose="8k3v" consentee="m0b8x"/>
-  <legalBases xsi:type="GDPR:PerformanceOfContract" id="f7dnl" entityName="Contract" forPurpose="8k3v" contractingParty="c9bird cadfg m0b8x"/>
-  <legalBases xsi:type="GDPR:ExerciseOfPublicAuthority" id="y7y8dg" entityName="Public Authority" forPurpose="8k3v"/>
-  <involvedParties xsi:type="GDPR:NaturalPerson" id="m0b8x" entityName="Natural Person"/>
-  <involvedParties xsi:type="GDPR:Controller" id="c9bird" entityName="Controller"/>
-  <involvedParties xsi:type="GDPR:ThirdParty" id="cadfg" entityName="Third Party"/>
+<GDPR:LegalAssessmentFacts xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:GDPR="http://www.example.org/GDPR" id="_xmuKEOfHEfCjQ5YFBpIFQA">
+  <actions xsi:type="GDPR:Processing" id="_yNLtIOfHEfCjQ5YFBpIFQA" entityName="Anonymization" inputData="_ibm1V-fIEfCjQ5YFBpIFQA" outputData="_ibm1V-fIEfCjQ5YFBpIFQA" purpose="_Ze1uqefIEfCjQ5YFBpIFQA" onTheBasisOf="_ihJKvOfKEfCjQ5YFBpIFQA" responsible="_3fthUufIEfCjQ5YFBpIFQA"/>
+  <actions xsi:type="GDPR:Collecting" id="_Mk_HUefIEfCjQ5YFBpIFQA" entityName="Collecting" outputData="_ibm1V-fIEfCjQ5YFBpIFQA" purpose="_Ze1uqefIEfCjQ5YFBpIFQA" onTheBasisOf="_qp7hrefIEfCjQ5YFBpIFQA" responsible="_3fthUufIEfCjQ5YFBpIFQA"/>
+  <actions xsi:type="GDPR:Transferring" id="_Ut7kYufIEfCjQ5YFBpIFQA" entityName="Transferring" inputData="_ibm1V-fIEfCjQ5YFBpIFQA" outputData="_ibm1V-fIEfCjQ5YFBpIFQA" purpose="_Ze1uqefIEfCjQ5YFBpIFQA" onTheBasisOf="_lBEbv-fIEfCjQ5YFBpIFQA" responsible="_3fthUufIEfCjQ5YFBpIFQA"/>
+  <actions xsi:type="GDPR:Storing" id="_WXcf5OfIEfCjQ5YFBpIFQA" entityName="Storage" inputData="_ibm1V-fIEfCjQ5YFBpIFQA" purpose="_Ze1uqefIEfCjQ5YFBpIFQA" onTheBasisOf="_yGv4i-fIEfCjQ5YFBpIFQA" responsible="_3fthUufIEfCjQ5YFBpIFQA"/>
+  <actions xsi:type="GDPR:Usage" id="_XmP1U-fIEfCjQ5YFBpIFQA" entityName="Usage" inputData="_ibm1V-fIEfCjQ5YFBpIFQA" outputData="_ibm1V-fIEfCjQ5YFBpIFQA" purpose="_Ze1uqefIEfCjQ5YFBpIFQA" onTheBasisOf="_yGv4i-fIEfCjQ5YFBpIFQA" responsible="_3fthUufIEfCjQ5YFBpIFQA"/>
+  <objects xsi:type="GDPR:Data" id="_fZmc5ufIEfCjQ5YFBpIFQA" entityName="Data"/>
+  <objects xsi:type="GDPR:PersonalData" id="_ibm1V-fIEfCjQ5YFBpIFQA" entityName="Personal Data" dataReferences="_lZB93ufKEfCjQ5YFBpIFQA"/>
+  <context xsi:type="GDPR:NaturalPerson" id="_lZB93ufKEfCjQ5YFBpIFQA" entityName="Bob" name="Bob"/>
+  <context xsi:type="GDPR:Purpose" id="_Ze1uqefIEfCjQ5YFBpIFQA" entityName="Purpose"/>
+  <context xsi:type="GDPR:Obligation" id="_lBEbv-fIEfCjQ5YFBpIFQA" entityName="Obligation" personalData="_ibm1V-fIEfCjQ5YFBpIFQA" forPurpose="_Ze1uqefIEfCjQ5YFBpIFQA"/>
+  <context xsi:type="GDPR:Consent" id="_qp7hrefIEfCjQ5YFBpIFQA" entityName="Consent" personalData="_ibm1V-fIEfCjQ5YFBpIFQA" forPurpose="_Ze1uqefIEfCjQ5YFBpIFQA" consentee="_lZB93ufKEfCjQ5YFBpIFQA"/>
+  <context xsi:type="GDPR:PerformanceOfContract" id="_yGv4i-fIEfCjQ5YFBpIFQA" entityName="Contract" personalData="_ibm1V-fIEfCjQ5YFBpIFQA" forPurpose="_Ze1uqefIEfCjQ5YFBpIFQA" contractingParty="_3fthUufIEfCjQ5YFBpIFQA"/>
+  <context xsi:type="GDPR:ExerciseOfPublicAuthority" id="_ihJKvOfKEfCjQ5YFBpIFQA" entityName="Authority" personalData="_ibm1V-fIEfCjQ5YFBpIFQA" forPurpose="_Ze1uqefIEfCjQ5YFBpIFQA"/>
+  <subjects xsi:type="GDPR:Controller" id="_3fthUufIEfCjQ5YFBpIFQA" entityName="Controller" name="Controller"/>
 </GDPR:LegalAssessmentFacts>
