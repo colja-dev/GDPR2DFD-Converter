@@ -8,7 +8,7 @@
 			<repository location="https://updatesite.palladio-simulator.com/palladio-core-commons/nightly/"/>
 		</location>	
 		<location includeAllPlatforms="false" includeConfigurePhase="true" includeMode="planner" includeSource="false" type="InstallableUnit">
-			<unit id="tools.mdsd.library.emfeditutils" version="0.0.0"/>
+			<unit id="tools.mdsd.library.emfeditutils.feature.feature.group" version="0.0.0"/>
 			<repository location="https://updatesite.mdsd.tools/library-emfeditutils/nightly/"/>
 		</location>
 		<location includeAllPlatforms="false" includeConfigurePhase="true" includeMode="planner" includeSource="false" type="InstallableUnit">
@@ -128,6 +128,10 @@
 		<location includeAllPlatforms="false" includeConfigurePhase="true" includeMode="planner" includeSource="false" type="InstallableUnit">
 			<repository location="https://model-based-data-protection-assessments.github.io/updatesite/nightly/tracemodel-metamodel"/>
 			<unit id="mdpa.gdpr.dfdconverter.tracemodel.feature.feature.group" version="0.0.0"/>
+		</location>
+		<location includeAllPlatforms="false" includeConfigurePhase="true" includeMode="planner" includeSource="false" type="InstallableUnit">
+			<repository location="https://model-based-data-protection-assessments.github.io/updatesite/nightly/laf-referencemodel/"/>
+			<unit id="mdpa.laf.referencemodel.feature.feature.group" version="1.0.0.202601130304"/>
 		</location>
 	</locations>
 </target>
