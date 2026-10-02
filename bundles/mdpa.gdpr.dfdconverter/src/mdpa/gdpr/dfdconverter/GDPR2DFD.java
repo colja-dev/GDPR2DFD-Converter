@@ -638,6 +638,14 @@ public class GDPR2DFD {
 					} else {
 						// Special case, here no assignment is set. It is up to the developer in the DFD/DD to decide what happens in this node.
 						// Once this is done in the DFD/DD, the trace keeps it up to date.
+						node.getBehavior().getOutPin().stream().forEach(outPin -> {
+							var assignment = ddFactory.createAssignment();
+							assignment.getInputPins().addAll(node.getBehavior().getInPin());
+							assignment.setOutputPin(outPin);
+							assignment.setTerm(ddFactory.createTRUE());
+							assignment.setEntityName("Dummy");
+							node.getBehavior().getAssignment().add(assignment);
+						});
 					}
 				}
 			}
