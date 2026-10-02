@@ -39,7 +39,7 @@ public class ScalabilityTests {
 	private static GDPRFactory gdprFactory = GDPRFactory.eINSTANCE;
 	private static final String resultFolder = "C:\\Users\\Huell\\Documents\\Studium\\HIWI\\GDPR2DFD-Converter\\tests\\mdpa.gdpr.dfdconverter.tests\\results\\Scalability\\";
 	
-	private static final int max = 6;
+	private static final int max = 3;
 	
 	//Disable for build
 	/*
@@ -137,7 +137,7 @@ public class ScalabilityTests {
 	                recordedDurations[i-1][j] = durationMs;
 	
 	                writer.write("Iteration " + i + " took " + durationMs + " ms " +
-	                             "with " + laf.getProcessing().size() + " processing elements.");
+	                             "with " + laf.getActions().size() + " processing elements.");
 	                writer.newLine();
 	            } 
 	            
@@ -192,7 +192,7 @@ public class ScalabilityTests {
 		                recordedDurations[i-1][j] = durationMs;
 		
 		                writer.write("Iteration " + i + " took " + durationMs + " ms " +
-		                             "with " + laf.getInvolvedParties().size() + " role elements.");
+		                             "with " + (laf.getSubjects().size() + laf.getContext().stream().filter(NaturalPerson.class::isInstance).count())  + " role + user elements.");
 		                writer.newLine();
 		            } 
 		            
@@ -248,7 +248,7 @@ public class ScalabilityTests {
 		                recordedDurations[i-1][j] = durationMs;
 		
 		                writer.write("Iteration " + i + " took " + durationMs + " ms " +
-		                             "with " + laf.getPurposes().size() + " purpose elements.");
+		                             "with " + laf.getContext().stream().filter(Purpose.class::isInstance).count() + " purpose elements.");
 		                writer.newLine();
 		            } 
 		            
@@ -341,9 +341,9 @@ public class ScalabilityTests {
 		PersonalData data = gdprFactory.createPersonalData();
 		NaturalPerson user = gdprFactory.createNaturalPerson();
 		data.getDataReferences().add(user);
-		laf.getProcessing().add(start);
-		laf.getInvolvedParties().add(user);
-		laf.getData().add(data);
+		laf.getActions().add(start);
+		laf.getContext().add(user);
+		laf.getObjects().add(data);
 		start.setEntityName("collecting");
 		data.setEntityName("data");
 		user.setEntityName("user");
@@ -351,7 +351,7 @@ public class ScalabilityTests {
 		Purpose purposeCollecting = gdprFactory.createPurpose();
 		purposeCollecting.setEntityName("purposeCollecting");
 		start.getPurpose().add(purposeCollecting);
-		laf.getPurposes().add(purposeCollecting);
+		laf.getContext().add(purposeCollecting);
 		
 		Consent consent = gdprFactory.createConsent();
 		consent.setEntityName("consent");
@@ -359,13 +359,13 @@ public class ScalabilityTests {
 		consent.setPersonalData(data);
 		consent.setConsentee(user);
 		start.getOnTheBasisOf().add(consent);
-		laf.getLegalBases().add(consent);
+		laf.getContext().add(consent);
 		
 		Controller controller = gdprFactory.createController();
 		start.setResponsible(controller);
 		start.getOutputData().add(data);
 		controller.setEntityName("Controller");
-		laf.getInvolvedParties().add(controller);
+		laf.getSubjects().add(controller);
 		
 		List<Processing> currentProcessing = new ArrayList<>();
 		currentProcessing.add(start);
@@ -384,7 +384,7 @@ public class ScalabilityTests {
 					current.getFollowingProcessing().add(processing);
 				
 					newCurrent.add(processing);
-					laf.getProcessing().add(processing);
+					laf.getActions().add(processing);
 				}			
 			}
 			currentProcessing = newCurrent;
@@ -397,21 +397,21 @@ public class ScalabilityTests {
 	public LegalAssessmentFacts createRoleLaf(int exponent) {
 		LegalAssessmentFacts laf = createProcessingLAF(1);
 		
-		PersonalData data = laf.getData().stream().filter(PersonalData.class::isInstance).map(PersonalData.class::cast).findAny().orElseThrow();
+		PersonalData data = laf.getObjects().stream().filter(PersonalData.class::isInstance).map(PersonalData.class::cast).findAny().orElseThrow();
 		
 		for (int i = 0; i < Math.pow(10, exponent) - 2; i++) {
 			NaturalPerson person = gdprFactory.createNaturalPerson();
 			person.setEntityName("person" + i);
 			data.getDataReferences().add(person);
-			laf.getInvolvedParties().add(person);
+			laf.getContext().add(person);
 			
 			Consent consent = gdprFactory.createConsent();
 			consent.setConsentee(person);
-			consent.getForPurpose().addAll(laf.getPurposes());
+			consent.getForPurpose().addAll(laf.getContext().stream().filter(Purpose.class::isInstance).map(Purpose.class::cast).toList());
 			consent.setPersonalData(data);
 			
-			laf.getProcessing().forEach(processing -> processing.getOnTheBasisOf().add(consent));
-			laf.getLegalBases().add(consent);			
+			laf.getActions().stream().filter(Processing.class::isInstance).forEach(processing -> ((Processing)processing).getOnTheBasisOf().add(consent));
+			laf.getContext().add(consent);			
 		}
 			
 		return laf;
@@ -419,16 +419,16 @@ public class ScalabilityTests {
 	
 	public LegalAssessmentFacts createPurposeLaf(int exponent) {
 		LegalAssessmentFacts laf = createProcessingLAF(1);
-		Consent consent = laf.getLegalBases().stream().filter(Consent.class::isInstance).map(Consent.class::cast).findAny().orElseThrow();
+		Consent consent = laf.getContext().stream().filter(Consent.class::isInstance).map(Consent.class::cast).findAny().orElseThrow();
 		
 		for (int i = 0; i < Math.pow(10, exponent) - 1; i++) { 
 			Purpose purpose = gdprFactory.createPurpose();
-			laf.getPurposes().add(purpose);
-			laf.getProcessing().forEach(processing -> processing.getPurpose().add(purpose));
+			laf.getContext().add(purpose);
+			laf.getActions().stream().filter(Processing.class::isInstance).forEach(processing -> ((Processing)processing).getPurpose().add(purpose));
 			consent.getForPurpose().add(purpose);
 		} 
 		
 		return laf;
-	}	
+	}
 	*/
 }

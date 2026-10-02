@@ -94,7 +94,7 @@ public class ManualModelCreation {
 	     	DataDictionary dd2 = gdpr2dfd.getDataDictionary();   
 	     	trace = gdpr2dfd.getGDPR2DFDTrace();
 
-	     	assertEquals(dfd2.getNodes().size(), laf.getProcessing().size());
+	     	assertEquals(dfd2.getNodes().size(), laf.getActions().stream().filter(a -> a instanceof Processing).count());
 	     	
 	     	DFD2GDPR dfd2gdpr2 = new DFD2GDPR(dfd2, dd2, trace);
 	     	dfd2gdpr2.transform();
@@ -159,8 +159,8 @@ public class ManualModelCreation {
 		 user.setEntityName("user");
 		 var guest = gdprFactory.createNaturalPerson();
 		 user.setEntityName("guest");
-		 laf.getInvolvedParties().add(user);
-		 laf.getInvolvedParties().add(guest);
+		 laf.getContext().add(user);
+		 laf.getContext().add(guest);
 		 
 		 var dataInstall = createAndAddData("", laf, null);
 		 var dataLogin = createAndAddData("", laf, List.of(user, guest));
@@ -193,20 +193,20 @@ public class ManualModelCreation {
 			 var consent = gdprFactory.createConsent();
 			 consent.setConsentee(user);
 			 consent.setPersonalData((PersonalData)data);
-			 laf.getLegalBases().add(consent);
+			 laf.getContext().add(consent);
 			 mapNodeToProcessing.values().forEach(p -> p.getOnTheBasisOf().add(consent));
 		 });
 		 
 		 var controller = gdprFactory.createController();
 		 controller.setEntityName("Controller");
-		 laf.getInvolvedParties().add(controller);
+		 laf.getSubjects().add(controller);
 		 mapNodeToProcessing.values().forEach(p -> p.setResponsible(controller));
 	 }
 	  
 	 	private static Purpose createAndAddPurpose(String name, List<Processing> processings, LegalAssessmentFacts laf) {
 	 		var purpose = gdprFactory.createPurpose();
 	 		purpose.setEntityName(name);
-	 		laf.getPurposes().add(purpose);
+	 		laf.getContext().add(purpose);
 	 		
 	 		processings.forEach(processing -> processing.getPurpose().add(purpose));
 	 		return purpose;
@@ -219,7 +219,7 @@ public class ManualModelCreation {
 	 			((PersonalData)data).getDataReferences().addAll(persons);
 	 		} else data = gdprFactory.createData();
 	 		data.setEntityName(name);
-	 		laf.getData().add(data);
+	 		laf.getObjects().add(data);
 	 		return data;
 	 	}
 	 
@@ -247,24 +247,24 @@ public class ManualModelCreation {
 	    	var patient = gdprFactory.createNaturalPerson();
 	    	patient.setEntityName("Patient");
 	    	patient.setName("Patient");
-	    	laf.getInvolvedParties().add(patient);	    	
+	    	laf.getContext().add(patient);	    	
 	    	
 	    	var personalData = gdprFactory.createPersonalData();
 	    	personalData.setEntityName("");
 	    	personalData.getDataReferences().add(patient);
-	    	laf.getData().add(personalData);
+	    	laf.getObjects().add(personalData);
 	    	
 	    	var riskData = gdprFactory.createData();
 	    	riskData.setEntityName("Risk Data");
-	    	laf.getData().add(riskData);
+	    	laf.getObjects().add(riskData);
 	    	
 	    	var controller = gdprFactory.createController();
 	    	controller.setEntityName("Controller");
-	    	laf.getInvolvedParties().add(controller);
+	    	laf.getSubjects().add(controller);
 	    	
 	    	var purpose = gdprFactory.createPurpose();
 	    	purpose.setEntityName("GP purpose");
-	    	laf.getPurposes().add(purpose);
+	    	laf.getContext().add(purpose);
 	    	
 	    	mapNodeToProcessing.values().forEach(processing -> processing.setResponsible(controller));
 	    	
@@ -332,7 +332,7 @@ public class ManualModelCreation {
 	    	if (mapNodeToProcessing != null) mapNodeToProcessing.put(node, processing);
 	    	
 	    	dfd.getNodes().add(node);
-	    	if (laf != null) { laf.getProcessing().add(processing);
+	    	if (laf != null) { laf.getActions().add(processing);
 	    	
 	    	var nodeTrace = tmFactory.createNodeTrace();
 	    	nodeTrace.setDfdNode(node);
