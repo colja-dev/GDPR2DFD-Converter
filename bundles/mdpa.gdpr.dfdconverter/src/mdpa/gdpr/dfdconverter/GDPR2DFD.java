@@ -626,6 +626,7 @@ public class GDPR2DFD {
 					if (data instanceof PersonalData personalData) {
 						if (!containsAssignment(node.getBehavior(), data) && processing.getFollowingProcessing().size() > 0) {
 							var assignment = ddFactory.createAssignment();
+							assignment.getInputPins().addAll(node.getBehavior().getInPin());
 							assignment.setOutputPin(node.getBehavior().getOutPin().stream().filter(pin -> pin.getEntityName().equals(personalData.getEntityName())).findAny().orElseThrow());
 							assignment.setTerm(ddFactory.createTRUE());
 							personalData.getDataReferences().forEach(person -> {
